@@ -2,11 +2,11 @@
 - hosts: mochimo
   become: yes
   tasks:
-      #- name: Install tmux
-      #  apt:
-      #      name: tmux
-      #      state: present
-      #      update_cache: true
+      - name: Install tmux
+        apt:
+            name: tmux
+            state: present
+            update_cache: true
 
       - name: Install bridge-utils
         apt:
@@ -14,17 +14,17 @@
             state: present
             update_cache: false
 
-     #- name: Install nvidia-driver-390
-     #   apt:
-     #       name: nvidia-driver-390
-     #       state: present
-     #       update_cache: false
-     #
-     #- name: Install nvidia-utils-390
-     #   apt:
-     #       name: nvidia-utils-390
-     #       state: present
-     #       update_cache: false
+     - name: Install nvidia-driver-390
+        apt:
+            name: nvidia-driver-390
+            state: present
+            update_cache: false
+     
+     - name: Install nvidia-utils-390
+        apt:
+            name: nvidia-utils-390
+            state: present
+            update_cache: false
 
       - name: Install build-essential
         apt:
