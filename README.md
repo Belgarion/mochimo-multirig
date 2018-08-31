@@ -1,3 +1,5 @@
+# Mochimo easy multirig setup #
+
 # Pre-release, not properly tested yet! #
 
 
