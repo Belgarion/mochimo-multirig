@@ -2,7 +2,7 @@
 echo "Waiting for master to start listening"
 /opt/mochimo/wait_for_ip.sh 10.200.{{rig_id}}.1 2095
 if [[ $? -ne 0 ]]; then
-	echo "Timed out waiting for {{host}}, aborting."
+	echo "Timed out waiting for 10.200.{{rig_id}}.1, aborting."
 	exit 1
 fi
 
