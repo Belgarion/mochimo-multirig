@@ -1,0 +1,185 @@
+---
+- hosts: mochimo
+  become: yes
+  tasks:
+      #- name: Install tmux
+      #  apt:
+      #      name: tmux
+      #      state: present
+      #      update_cache: true
+
+      - name: Install bridge-utils
+        apt:
+            name: bridge-utils
+            state: present
+            update_cache: false
+
+     #- name: Install nvidia-driver-390
+     #   apt:
+     #       name: nvidia-driver-390
+     #       state: present
+     #       update_cache: false
+     #
+     #- name: Install nvidia-utils-390
+     #   apt:
+     #       name: nvidia-utils-390
+     #       state: present
+     #       update_cache: false
+
+      - name: Install build-essential
+        apt:
+            name: build-essential
+            state: present
+            update_cache: false
+
+      - name: Install nvidia-cuda-dev
+        apt:
+            name: nvidia-cuda-dev
+            state: present
+            update_cache: false
+
+      - name: Install nvidia-cuda-toolkit
+        apt:
+            name: nvidia-cuda-toolkit
+            state: present
+            update_cache: false
+
+      - name: Install netcat-openbsd
+        apt:
+            name: netcat-openbsd
+            state: present
+            update_cache: false
+
+      - name: Create folder structure for master
+        file:
+            path: /opt/mochimo/master/mochi/bin
+            state: directory
+            mode: 0755
+
+      - name: Create folder structure for slave
+        file:
+            path: /opt/mochimo/slave/mochi/bin
+            state: directory
+            mode: 0755
+
+      - name: Fetch GPU miner
+        get_url:
+            dest: /opt/mochimo/mochi_cuda.tar.gz
+            force: no
+            url: https://cdn.discordapp.com/attachments/476116222161715212/477536477845389322/mochimo-main-net-CUDA-v1.9b-BETA.tgz
+            mode: 0644
+
+      - name: Create folder for building GPU miner
+        file:
+            path: /opt/mochimo/build
+            state: directory
+            mode: 0755
+
+      - name: Unpack GPU miner
+        unarchive:
+            dest: /opt/mochimo/build/
+            src: /opt/mochimo/mochi_cuda.tar.gz
+            remote_src: yes
+
+      - name: Build GPU miner
+        command: ./makeunx bin
+        args:
+            chdir: /opt/mochimo/build/mochi/src/
+            creates: /opt/mochimo/build/mochi/src/mochimo
+
+      - name: Copy GPU miner to master
+        copy:
+            src: /opt/mochimo/build/mochi/src/{{item}}
+            dest: /opt/mochimo/master/mochi/bin/
+            remote_src: yes
+        with_items:
+            ['gomochi', 'resume', 'smode', 'sresume', 'mochimo', 'bval', 'bcon', 'bup', 'sortlt', 'neogen', 'txclean', 'wallet', 'bx', 'genblock.bc', 'tfile.dat']
+
+
+      - name: Copy GPU miner to slaves
+        copy:
+            src: /opt/mochimo/build/mochi/src/{{item}}
+            dest: /opt/mochimo/slave/mochi/bin/
+            remote_src: yes
+        with_items:
+            ['gomochi', 'resume', 'smode', 'sresume', 'mochimo', 'bval', 'bcon', 'bup', 'sortlt', 'neogen', 'txclean', 'wallet', 'bx', 'genblock.bc', 'tfile.dat']
+
+      - name: Create start_firewall.sh
+        template:
+            src: templates/start_firewall.sh
+            dest: /opt/mochimo/start_firewall.sh
+            mode: 0755
+
+      - name: Create add_routes.sh
+        template:
+            src: templates/add_routes.sh
+            dest: /opt/mochimo/add_routes.sh
+            mode: 0755
+
+      - name: Create start_slaves.sh
+        template:
+            src: templates/start_slaves.sh
+            dest: /opt/mochimo/slave/mochi/bin/start_slaves.sh
+            mode: 0755
+
+      - name: Create start_master.sh
+        template:
+            src: templates/start_master.sh
+            dest: /opt/mochimo/master/mochi/bin/start_master.sh
+            mode: 0755
+
+      - name: Create wait_for_ip.sh
+        template:
+            src: templates/wait_for_ip.sh
+            dest: /opt/mochimo/wait_for_ip.sh
+            mode: 0755
+
+      - name: Copy maddr.dat to master
+        copy:
+            src: data/maddr.dat
+            dest: /opt/mochimo/master/mochi/bin/maddr.dat
+            mode: 0644
+
+      - name: Copy maddr.dat to slaves
+        copy:
+            src: data/maddr.dat
+            dest: /opt/mochimo/slave/mochi/bin/maddr.dat
+            mode: 0644
+
+      - name: Create coreip.lst for master
+        template:
+            src: templates/coreip-master.lst
+            dest: /opt/mochimo/master/mochi/bin/coreip.lst
+            mode: 0644
+
+      - name: Create coreip.lst for slaves
+        template:
+            src: templates/coreip-slave.lst
+            dest: /opt/mochimo/slave/mochi/bin/coreip.lst
+            mode: 0644
+
+      - name: Create run_netns.sh
+        template:
+            src: templates/run_netns.sh
+            dest: /opt/mochimo/slave/mochi/bin/run_netns.sh
+            mode: 0755
+
+      - name: Run add_routes.sh
+        command: /opt/mochimo/add_routes.sh
+
+      - name: Run start_firewall.sh
+        command: /opt/mochimo/start_firewall.sh
+
+      - name: Run start_master.sh
+        command: /opt/mochimo/master/mochi/bin/start_master.sh
+        args:
+            chdir: /opt/mochimo/master/mochi/bin/
+        register: master
+      - debug: var=master.stdout_lines
+
+      - name: Run start_slaves.sh
+        command: /opt/mochimo/slave/mochi/bin/start_slaves.sh
+        args:
+            chdir: /opt/mochimo/slave/mochi/bin/
+        register: slaves
+      - debug: var=slaves.stdout_lines

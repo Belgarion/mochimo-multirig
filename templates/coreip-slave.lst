@@ -1,0 +1,1 @@
+10.200.{{ rig_id }}.1 master-{{ rig_id }}
