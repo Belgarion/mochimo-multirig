@@ -20,5 +20,5 @@ Ansible playbook for setting up multirig mochimo mining.
 
 ### Monitoring your rigs ###
 On each rig open two terminals.
-In the first terminal run `sudo tmux a -t mochi-master` to monitor the master instance.
-In the second terminal run `sudo tmux a -t mochi` to monitor the slave nodes.
+In the first terminal run `sudo tmux a -t=mochi-master` to monitor the master instance.
+In the second terminal run `sudo tmux a -t=mochi` to monitor the slave nodes.

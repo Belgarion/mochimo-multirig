@@ -121,7 +121,13 @@
       - name: Create setup_networking.sh
         template:
             src: templates/setup_networking.sh
-            dest: /opt/mochimo/slave/mochi/bin/setup_networking.sh
+            dest: /opt/mochimo/setup_networking.sh
+            mode: 0755
+
+      - name: Create run_gomochi.sh
+        template:
+            src: templates/run_gomochi.sh
+            dest: /opt/mochimo/slave/mochi/bin/run_gomochi.sh
             mode: 0755
 
       - name: Create start_slaves.sh

@@ -13,7 +13,7 @@ fi
 {% endif %}
 {% endfor %}
 {% endif %}
-if tmux has-session -t mochi-master; then
+if tmux has-session -t=mochi-master; then
 	echo "Master already running, keeping it."
 else
 	echo "Starting master"
