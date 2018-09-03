@@ -1,6 +1,5 @@
 {% if has_public == "true" %}
 # Coreip.lst for node with public ip
-
 # Example core ip list for Mochimo HQ
 65.151.42.11 main-net-1
 65.151.42.12 main-net-2
