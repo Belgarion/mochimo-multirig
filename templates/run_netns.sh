@@ -10,10 +10,8 @@ if [ -z $2 ]; then
 fi
 NSNAME="$1"
 IP=$2
-CUDA_DEVICES="$3"
-
-# Enable forwarding
-sysctl -q net.ipv4.conf.all.forwarding=1
+DEFGW=$3
+CUDA_DEVICES="$4"
 
 if ip netns list | grep -q "^${NSNAME}\\s"; then
 	echo "Namespace $NSNAME already exists, recreating."
@@ -37,29 +35,18 @@ ip link add v-${NSNAME} type veth peer name vns-${NSNAME}
 ip link set vns-${NSNAME} netns ${NSNAME}
 
 
-if ! brctl show | grep -q "^br-ns\\s"; then
-	# bridge does not exist, create it
-	brctl addbr br-ns
-fi
-
-if ! ip addr show br-ns | grep -q "inet 10.200.1.1/24"; then
-	# ip does not exist on bridge, add it
-	ip addr add 10.200.1.1/24 dev br-ns
-fi
-
 # Setup IP address of v-eth1.
 ip link set v-${NSNAME} up
 brctl addif br-ns v-${NSNAME}
 ip link set br-ns up
 
-
 # Setup IP address of v-peer1.
 ip netns exec ${NSNAME} ip addr add ${IP}/24 dev vns-${NSNAME}
 ip netns exec ${NSNAME} ip link set vns-${NSNAME} up
 ip netns exec ${NSNAME} ip link set lo up
-#
+
 # Add default route
-ip netns exec ${NSNAME} ip route add default via 10.200.1.1
+ip netns exec ${NSNAME} ip route add default via $DEFGW
 
 # Copy datadir
 #cp -a d d-${NSNAME}

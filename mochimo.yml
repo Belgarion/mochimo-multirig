@@ -14,13 +14,13 @@
             state: present
             update_cache: false
 
-     - name: Install nvidia-driver-390
+      - name: Install nvidia-driver-390
         apt:
             name: nvidia-driver-390
             state: present
             update_cache: false
      
-     - name: Install nvidia-utils-390
+      - name: Install nvidia-utils-390
         apt:
             name: nvidia-utils-390
             state: present
@@ -52,13 +52,13 @@
 
       - name: Create folder structure for master
         file:
-            path: /opt/mochimo/master/mochi/bin
+            path: /opt/mochimo/master/mochi/bin/d/bc
             state: directory
             mode: 0755
 
       - name: Create folder structure for slave
         file:
-            path: /opt/mochimo/slave/mochi/bin
+            path: /opt/mochimo/slave/mochi/bin/d/bc
             state: directory
             mode: 0755
 
@@ -92,6 +92,7 @@
             src: /opt/mochimo/build/mochi/src/{{item}}
             dest: /opt/mochimo/master/mochi/bin/
             remote_src: yes
+            mode: 0755
         with_items:
             ['gomochi', 'resume', 'smode', 'sresume', 'mochimo', 'bval', 'bcon', 'bup', 'sortlt', 'neogen', 'txclean', 'wallet', 'bx', 'genblock.bc', 'tfile.dat']
 
@@ -101,6 +102,7 @@
             src: /opt/mochimo/build/mochi/src/{{item}}
             dest: /opt/mochimo/slave/mochi/bin/
             remote_src: yes
+            mode: 0755
         with_items:
             ['gomochi', 'resume', 'smode', 'sresume', 'mochimo', 'bval', 'bcon', 'bup', 'sortlt', 'neogen', 'txclean', 'wallet', 'bx', 'genblock.bc', 'tfile.dat']
 
@@ -114,6 +116,12 @@
         template:
             src: templates/add_routes.sh
             dest: /opt/mochimo/add_routes.sh
+            mode: 0755
+
+      - name: Create setup_networking.sh
+        template:
+            src: templates/setup_networking.sh
+            dest: /opt/mochimo/slave/mochi/bin/setup_networking.sh
             mode: 0755
 
       - name: Create start_slaves.sh
