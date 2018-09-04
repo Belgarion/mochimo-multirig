@@ -1,6 +1,6 @@
 [mochimo]
 172.17.3.74 ansible_connection=local num_gpus=3 rig_id=1 has_public=true
-172.17.3.43 num_gpus=2 rig_id=2 has_public=false
+172.17.3.43 num_gpus=4 rig_id=2 has_public=false
 
 [mochimo:vars]
 ansible_user=ubuntu

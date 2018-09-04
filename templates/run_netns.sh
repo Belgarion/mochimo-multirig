@@ -52,11 +52,11 @@ ip netns exec ${NSNAME} ip route add default via $DEFGW
 #cp -a d d-${NSNAME}
 mkdir -p d-${NSNAME}/bc
 
-if tmux has-session -t=mochi; then
-	tmux split-window -t=mochi "ip netns exec ${NSNAME} ./run_gomochi.sh ${NSNAME} ${CUDA_DEVICES}"
+if tmux has-session -t=mochi:0; then
+	tmux split-window -t=mochi:0 "ip netns exec ${NSNAME} ./run_gomochi.sh ${NSNAME} ${CUDA_DEVICES}"
 else
 	tmux -2 new-session -d -s mochi "ip netns exec ${NSNAME} ./run_gomochi.sh ${NSNAME} ${CUDA_DEVICES}"
 fi
 
-tmux select-layout -t=mochi tiled
+tmux select-layout -t=mochi:0 tiled
 
